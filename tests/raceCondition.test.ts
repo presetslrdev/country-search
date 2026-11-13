@@ -87,15 +87,17 @@ describe('CountrySearchController race condition and cancellation', () => {
     calls[1]?.deferred.resolve(
       new Response(JSON.stringify([{ name: 'Spain' }]), { status: 200 }),
     );
-    await vi.runAllTicks();
-    await Promise.resolve();
+    for (let i = 0; i < 10; i += 1) {
+      await Promise.resolve();
+    }
 
     // 5. Even if "sp" attempts to resolve later, it was already aborted
     calls[0]?.deferred.resolve(
       new Response(JSON.stringify([{ name: 'Singapore' }]), { status: 200 }),
     );
-    await vi.runAllTicks();
-    await Promise.resolve();
+    for (let i = 0; i < 10; i += 1) {
+      await Promise.resolve();
+    }
 
     const finalState = states.at(-1);
     expect(finalState?.status).toBe('success');
